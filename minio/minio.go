@@ -26,6 +26,7 @@ type Config struct {
 	AccessKey string
 	Bucket    string
 	Endpoint  string
+	Region    string
 	IsSSL     bool
 	ACL       policy.BucketPolicy
 }
@@ -97,7 +98,7 @@ func (c Client) Put(urlPath string, reader io.Reader) (*common.Object, error) {
 	if err == nil && !status {
 		// instead of storing in environment variable, if possible
 		// use other way depending on your architecture
-		if err := c.MakeBucket(c.Config.Bucket, os.Getenv("region")); err != nil {
+		if err := c.MakeBucket(c.Config.Bucket, c.Config.Region); err != nil {
 			return nil, err
 		}
 
