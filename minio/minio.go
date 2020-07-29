@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/minio/minio-go"
+	"github.com/minio/minio-go/pkg/policy"
 
 	"github.com/dulumao/uploader/common"
 )
@@ -26,6 +27,7 @@ type Config struct {
 	Bucket    string
 	Endpoint  string
 	IsSSL     bool
+	ACL       policy.BucketPolicy
 }
 
 func New(config *Config) *Client {
@@ -41,6 +43,9 @@ func New(config *Config) *Client {
 		//c.Bucket, err = Client.Bucket(config.Bucket)
 	}
 
+	if config.ACL == "" {
+		config.ACL = policy.BucketPolicyNone
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +97,12 @@ func (c Client) Put(urlPath string, reader io.Reader) (*common.Object, error) {
 	if err == nil && !status {
 		// instead of storing in environment variable, if possible
 		// use other way depending on your architecture
-		if c.MakeBucket(c.Config.Bucket, os.Getenv("region")) != nil {
+		if err := c.MakeBucket(c.Config.Bucket, os.Getenv("region")); err != nil {
+			return nil, err
+		}
+
+		// 可选值有[PolicyType.NONE, PolicyType.READ_ONLY, PolicyType.READ_WRITE, PolicyType.WRITE_ONLY].
+		if err := c.SetBucketPolicy(c.Config.Bucket, string(c.Config.ACL)); err != nil {
 			return nil, err
 		}
 	}
