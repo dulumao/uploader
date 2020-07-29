@@ -6,6 +6,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.4+incompatible
 	github.com/ansel1/merry v1.5.1 // indirect
 	github.com/aws/aws-sdk-go v1.33.14
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dulumao/logger v0.0.0-20200727024458-14289b4f8316
 	github.com/go-ini/ini v1.57.0 // indirect
 	github.com/h2non/filetype v1.1.0 // indirect

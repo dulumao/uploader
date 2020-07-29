@@ -45,7 +45,7 @@ func New(config *Config) *Client {
 	}
 
 	if config.ACL == "" {
-		config.ACL = policy.BucketPolicyNone
+		config.ACL = policy.BucketPolicyReadWrite
 	}
 	if err != nil {
 		panic(err)
@@ -102,10 +102,18 @@ func (c Client) Put(urlPath string, reader io.Reader) (*common.Object, error) {
 			return nil, err
 		}
 
+		//policy := minio.NewPostPolicy()
+		// Apply upload policy restrictions:
+		//policy.SetBucket(c.Config.Bucket)
+		//policy.String()
+
+		//policy := `{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::my-bucketname/*"],"Sid": ""}]}`
+
 		// 可选值有[PolicyType.NONE, PolicyType.READ_ONLY, PolicyType.READ_WRITE, PolicyType.WRITE_ONLY].
-		if err := c.SetBucketPolicy(c.Config.Bucket, string(c.Config.ACL)); err != nil {
-			return nil, err
-		}
+		//if err := c.SetBucketPolicy(c.Config.Bucket, "READ_WRITE"); err != nil {
+		//	panic(err)
+		//	return nil, err
+		//}
 	}
 
 	_, err = c.PutObject(c.Config.Bucket, c.ToRelativePath(urlPath), reader, -1, minio.PutObjectOptions{})
