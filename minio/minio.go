@@ -5,11 +5,13 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/h2non/filetype"
 	"github.com/minio/minio-go"
 	"github.com/minio/minio-go/pkg/policy"
 
@@ -116,7 +118,13 @@ func (c Client) Put(urlPath string, reader io.Reader) (*common.Object, error) {
 		//}
 	}
 
-	_, err = c.PutObject(c.Config.Bucket, c.ToRelativePath(urlPath), reader, -1, minio.PutObjectOptions{})
+	extension := path.Ext(urlPath)
+	fileMIME := filetype.GetType(extension[1:])
+	contentType := fileMIME.MIME.Value
+
+	_, err = c.PutObject(c.Config.Bucket, c.ToRelativePath(urlPath), reader, -1, minio.PutObjectOptions{
+		ContentType: contentType,
+	})
 
 	if err != nil {
 		panic(err)
